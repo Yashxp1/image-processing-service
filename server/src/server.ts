@@ -1,13 +1,26 @@
+import dotenv from "dotenv";
 import express from "express";
+import cors from 'cors';
+import authRoute from "./routes/auth";
+
+
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+dotenv.config();
 
-app.get("/", (req, res) => {
-  res.send("hello from the server");
-});
+app.use(express.json());
+app.use(cors());
+
+app.use("/api/v1/auth", authRoute);
+
+const PORT = 8080;
 
 app.listen(PORT, () => {
-  console.log("server started on: ", PORT);
+  try {
+    console.log(`Server started on PORT: ${PORT}`);
+  } catch (error) {
+    console.log("FAILED to connect to DB", error);
+    process.exit(1);
+  }
 });
