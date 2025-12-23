@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { generateToken } from "../lib/token";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -33,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name,
         email,
@@ -41,12 +42,16 @@ export const register = async (req: Request, res: Response) => {
       },
     });
 
+    if (newUser) {
+      generateToken(newUser.id, res);
+    }
+
     return res.status(201).json({
       success: true,
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
       },
     });
   } catch (error) {
@@ -87,11 +92,25 @@ export const login = async (req: Request, res: Response) => {
         .json({ success: false, error: "user or password is incorrect" });
     }
 
+    generateToken(checkUser.id, res);
+
     return res.status(201).json({
       success: true,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ sucess: false, error });
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res
+      .status(201)
+      .json({ success: false, message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Error in logout controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
