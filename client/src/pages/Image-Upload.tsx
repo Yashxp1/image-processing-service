@@ -19,8 +19,6 @@ const ImageUpload = () => {
     console.log("Uploading file to server:", image);
   };
 
-  console.log("image: => ", image);
-
   return (
     <div className="flex flex-col justify-center items-center h-screen">
       <div className="flex justify-center items-center m-2">
