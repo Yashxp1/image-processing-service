@@ -12,7 +12,23 @@ model User {
   name     String
   email    String @unique
   password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images Image[]
   // token    String
 }
 
+model Image {
+  id          String  @id @default(cuid())
+  name        String?
+  size        String
+  storage_URL String
 
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
