@@ -608,7 +608,9 @@ export const ImageScalarFieldEnum = {
   id: 'id',
   name: 'name',
   size: 'size',
-  storage_URL: 'storage_URL',
+  image_Url: 'image_Url',
+  mimeType: 'mimeType',
+  s3Key: 's3Key',
   userId: 'userId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
