@@ -5,6 +5,7 @@
 
     "module": "CommonJS",
     "target": "ES2020",
+   "types": ["./src/@types/express"],
     // "moduleResolution": "node",
 
     "esModuleInterop": true,

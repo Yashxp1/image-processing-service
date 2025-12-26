@@ -6,12 +6,13 @@ interface JwtPayload {
   userId: string;
 }
 
-export const middleware = async (
+export const ProtectRoute = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    
     const token = req.cookies.jwt;
 
     if (!token) {
