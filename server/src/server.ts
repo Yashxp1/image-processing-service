@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 import express from "express";
-import cors from 'cors';
+import cors from "cors";
 import authRoute from "./routes/auth";
-import uploadRoute from "./routes/upload";
 import cookieParser from "cookie-parser";
+import imageRoute from "./routes/images";
 
 const app = express();
 app.use(cookieParser());
@@ -14,15 +14,10 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/v1/auth", authRoute);
-app.use("/api/v1", uploadRoute);
+app.use("/api/v1", imageRoute);
 
 const PORT = 8080;
 
 app.listen(PORT, () => {
-  try {
-    console.log(`Server started on PORT: ${PORT}`);
-  } catch (error) {
-    console.log("FAILED to connect to DB", error);
-    process.exit(1);
-  }
+  console.log(`Server is running on: http://localhost:${PORT}`);
 });
