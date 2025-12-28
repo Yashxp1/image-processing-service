@@ -20,17 +20,28 @@ export type ImageModel = runtime.Types.Result.DefaultSelection<Prisma.$ImagePayl
 
 export type AggregateImage = {
   _count: ImageCountAggregateOutputType | null
+  _avg: ImageAvgAggregateOutputType | null
+  _sum: ImageSumAggregateOutputType | null
   _min: ImageMinAggregateOutputType | null
   _max: ImageMaxAggregateOutputType | null
+}
+
+export type ImageAvgAggregateOutputType = {
+  size: number | null
+}
+
+export type ImageSumAggregateOutputType = {
+  size: number | null
 }
 
 export type ImageMinAggregateOutputType = {
   id: string | null
   name: string | null
-  size: string | null
+  size: number | null
   image_Url: string | null
   mimeType: string | null
   s3Key: string | null
+  isEdited: boolean | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -39,10 +50,11 @@ export type ImageMinAggregateOutputType = {
 export type ImageMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  size: string | null
+  size: number | null
   image_Url: string | null
   mimeType: string | null
   s3Key: string | null
+  isEdited: boolean | null
   userId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -55,12 +67,21 @@ export type ImageCountAggregateOutputType = {
   image_Url: number
   mimeType: number
   s3Key: number
+  isEdited: number
   userId: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type ImageAvgAggregateInputType = {
+  size?: true
+}
+
+export type ImageSumAggregateInputType = {
+  size?: true
+}
 
 export type ImageMinAggregateInputType = {
   id?: true
@@ -69,6 +90,7 @@ export type ImageMinAggregateInputType = {
   image_Url?: true
   mimeType?: true
   s3Key?: true
+  isEdited?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -81,6 +103,7 @@ export type ImageMaxAggregateInputType = {
   image_Url?: true
   mimeType?: true
   s3Key?: true
+  isEdited?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -93,6 +116,7 @@ export type ImageCountAggregateInputType = {
   image_Url?: true
   mimeType?: true
   s3Key?: true
+  isEdited?: true
   userId?: true
   createdAt?: true
   updatedAt?: true
@@ -137,6 +161,18 @@ export type ImageAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ImageAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ImageSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ImageMinAggregateInputType
@@ -167,6 +203,8 @@ export type ImageGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: ImageCountAggregateInputType | true
+  _avg?: ImageAvgAggregateInputType
+  _sum?: ImageSumAggregateInputType
   _min?: ImageMinAggregateInputType
   _max?: ImageMaxAggregateInputType
 }
@@ -174,14 +212,17 @@ export type ImageGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type ImageGroupByOutputType = {
   id: string
   name: string | null
-  size: string | null
+  size: number | null
   image_Url: string | null
   mimeType: string
   s3Key: string
+  isEdited: boolean | null
   userId: string
   createdAt: Date
   updatedAt: Date
   _count: ImageCountAggregateOutputType | null
+  _avg: ImageAvgAggregateOutputType | null
+  _sum: ImageSumAggregateOutputType | null
   _min: ImageMinAggregateOutputType | null
   _max: ImageMaxAggregateOutputType | null
 }
@@ -207,10 +248,11 @@ export type ImageWhereInput = {
   NOT?: Prisma.ImageWhereInput | Prisma.ImageWhereInput[]
   id?: Prisma.StringFilter<"Image"> | string
   name?: Prisma.StringNullableFilter<"Image"> | string | null
-  size?: Prisma.StringNullableFilter<"Image"> | string | null
+  size?: Prisma.IntNullableFilter<"Image"> | number | null
   image_Url?: Prisma.StringNullableFilter<"Image"> | string | null
   mimeType?: Prisma.StringFilter<"Image"> | string
   s3Key?: Prisma.StringFilter<"Image"> | string
+  isEdited?: Prisma.BoolNullableFilter<"Image"> | boolean | null
   userId?: Prisma.StringFilter<"Image"> | string
   createdAt?: Prisma.DateTimeFilter<"Image"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Image"> | Date | string
@@ -224,6 +266,7 @@ export type ImageOrderByWithRelationInput = {
   image_Url?: Prisma.SortOrderInput | Prisma.SortOrder
   mimeType?: Prisma.SortOrder
   s3Key?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -236,10 +279,11 @@ export type ImageWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ImageWhereInput[]
   NOT?: Prisma.ImageWhereInput | Prisma.ImageWhereInput[]
   name?: Prisma.StringNullableFilter<"Image"> | string | null
-  size?: Prisma.StringNullableFilter<"Image"> | string | null
+  size?: Prisma.IntNullableFilter<"Image"> | number | null
   image_Url?: Prisma.StringNullableFilter<"Image"> | string | null
   mimeType?: Prisma.StringFilter<"Image"> | string
   s3Key?: Prisma.StringFilter<"Image"> | string
+  isEdited?: Prisma.BoolNullableFilter<"Image"> | boolean | null
   userId?: Prisma.StringFilter<"Image"> | string
   createdAt?: Prisma.DateTimeFilter<"Image"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Image"> | Date | string
@@ -253,12 +297,15 @@ export type ImageOrderByWithAggregationInput = {
   image_Url?: Prisma.SortOrderInput | Prisma.SortOrder
   mimeType?: Prisma.SortOrder
   s3Key?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ImageCountOrderByAggregateInput
+  _avg?: Prisma.ImageAvgOrderByAggregateInput
   _max?: Prisma.ImageMaxOrderByAggregateInput
   _min?: Prisma.ImageMinOrderByAggregateInput
+  _sum?: Prisma.ImageSumOrderByAggregateInput
 }
 
 export type ImageScalarWhereWithAggregatesInput = {
@@ -267,10 +314,11 @@ export type ImageScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ImageScalarWhereWithAggregatesInput | Prisma.ImageScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Image"> | string
   name?: Prisma.StringNullableWithAggregatesFilter<"Image"> | string | null
-  size?: Prisma.StringNullableWithAggregatesFilter<"Image"> | string | null
+  size?: Prisma.IntNullableWithAggregatesFilter<"Image"> | number | null
   image_Url?: Prisma.StringNullableWithAggregatesFilter<"Image"> | string | null
   mimeType?: Prisma.StringWithAggregatesFilter<"Image"> | string
   s3Key?: Prisma.StringWithAggregatesFilter<"Image"> | string
+  isEdited?: Prisma.BoolNullableWithAggregatesFilter<"Image"> | boolean | null
   userId?: Prisma.StringWithAggregatesFilter<"Image"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Image"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Image"> | Date | string
@@ -279,10 +327,11 @@ export type ImageScalarWhereWithAggregatesInput = {
 export type ImageCreateInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutImagesInput
@@ -291,10 +340,11 @@ export type ImageCreateInput = {
 export type ImageUncheckedCreateInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -303,10 +353,11 @@ export type ImageUncheckedCreateInput = {
 export type ImageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutImagesNestedInput
@@ -315,10 +366,11 @@ export type ImageUpdateInput = {
 export type ImageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -327,10 +379,11 @@ export type ImageUncheckedUpdateInput = {
 export type ImageCreateManyInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -339,10 +392,11 @@ export type ImageCreateManyInput = {
 export type ImageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -350,10 +404,11 @@ export type ImageUpdateManyMutationInput = {
 export type ImageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,9 +431,14 @@ export type ImageCountOrderByAggregateInput = {
   image_Url?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
   s3Key?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ImageAvgOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type ImageMaxOrderByAggregateInput = {
@@ -388,6 +448,7 @@ export type ImageMaxOrderByAggregateInput = {
   image_Url?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
   s3Key?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -400,9 +461,14 @@ export type ImageMinOrderByAggregateInput = {
   image_Url?: Prisma.SortOrder
   mimeType?: Prisma.SortOrder
   s3Key?: Prisma.SortOrder
+  isEdited?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ImageSumOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type ImageCreateNestedManyWithoutUserInput = {
@@ -451,13 +517,26 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
+}
+
 export type ImageCreateWithoutUserInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -465,10 +544,11 @@ export type ImageCreateWithoutUserInput = {
 export type ImageUncheckedCreateWithoutUserInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -505,10 +585,11 @@ export type ImageScalarWhereInput = {
   NOT?: Prisma.ImageScalarWhereInput | Prisma.ImageScalarWhereInput[]
   id?: Prisma.StringFilter<"Image"> | string
   name?: Prisma.StringNullableFilter<"Image"> | string | null
-  size?: Prisma.StringNullableFilter<"Image"> | string | null
+  size?: Prisma.IntNullableFilter<"Image"> | number | null
   image_Url?: Prisma.StringNullableFilter<"Image"> | string | null
   mimeType?: Prisma.StringFilter<"Image"> | string
   s3Key?: Prisma.StringFilter<"Image"> | string
+  isEdited?: Prisma.BoolNullableFilter<"Image"> | boolean | null
   userId?: Prisma.StringFilter<"Image"> | string
   createdAt?: Prisma.DateTimeFilter<"Image"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Image"> | Date | string
@@ -517,10 +598,11 @@ export type ImageScalarWhereInput = {
 export type ImageCreateManyUserInput = {
   id?: string
   name?: string | null
-  size?: string | null
+  size?: number | null
   image_Url?: string | null
   mimeType: string
   s3Key: string
+  isEdited?: boolean | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -528,10 +610,11 @@ export type ImageCreateManyUserInput = {
 export type ImageUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -539,10 +622,11 @@ export type ImageUpdateWithoutUserInput = {
 export type ImageUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -550,10 +634,11 @@ export type ImageUncheckedUpdateWithoutUserInput = {
 export type ImageUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  size?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   image_Url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   s3Key?: Prisma.StringFieldUpdateOperationsInput | string
+  isEdited?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -567,6 +652,7 @@ export type ImageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   image_Url?: boolean
   mimeType?: boolean
   s3Key?: boolean
+  isEdited?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -580,6 +666,7 @@ export type ImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   image_Url?: boolean
   mimeType?: boolean
   s3Key?: boolean
+  isEdited?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -593,6 +680,7 @@ export type ImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   image_Url?: boolean
   mimeType?: boolean
   s3Key?: boolean
+  isEdited?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -606,12 +694,13 @@ export type ImageSelectScalar = {
   image_Url?: boolean
   mimeType?: boolean
   s3Key?: boolean
+  isEdited?: boolean
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "size" | "image_Url" | "mimeType" | "s3Key" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
+export type ImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "size" | "image_Url" | "mimeType" | "s3Key" | "isEdited" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["image"]>
 export type ImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Image$userArgs<ExtArgs>
 }
@@ -630,10 +719,11 @@ export type $ImagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string | null
-    size: string | null
+    size: number | null
     image_Url: string | null
     mimeType: string
     s3Key: string
+    isEdited: boolean | null
     userId: string
     createdAt: Date
     updatedAt: Date
@@ -1063,10 +1153,11 @@ export interface Prisma__ImageClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface ImageFieldRefs {
   readonly id: Prisma.FieldRef<"Image", 'String'>
   readonly name: Prisma.FieldRef<"Image", 'String'>
-  readonly size: Prisma.FieldRef<"Image", 'String'>
+  readonly size: Prisma.FieldRef<"Image", 'Int'>
   readonly image_Url: Prisma.FieldRef<"Image", 'String'>
   readonly mimeType: Prisma.FieldRef<"Image", 'String'>
   readonly s3Key: Prisma.FieldRef<"Image", 'String'>
+  readonly isEdited: Prisma.FieldRef<"Image", 'Boolean'>
   readonly userId: Prisma.FieldRef<"Image", 'String'>
   readonly createdAt: Prisma.FieldRef<"Image", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Image", 'DateTime'>
