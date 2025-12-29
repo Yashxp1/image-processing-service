@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../lib/s3";
 import { applyTransformations, TransformOptions } from "../lib/transform";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const getImages = async (req: Request, res: Response) => {
   try {
@@ -12,9 +13,25 @@ export const getImages = async (req: Request, res: Response) => {
       },
     });
 
+    const generateImageUrl = await Promise.all(
+      images.map(async (img) => {
+        const cmd = new GetObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+        Key: img.thumbnailKey || img.s3Key,
+        });
+
+        const url = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
+
+        return {
+          ...img,
+          url,
+        };
+      })
+    );
+
     return res.status(200).json({
-      status: true,
-      data: images,
+      success: true,
+      data: generateImageUrl,
     });
   } catch (error) {
     console.log(error);
@@ -46,17 +63,26 @@ export const getImageById = async (req: Request, res: Response) => {
       Key: image.s3Key!,
     });
 
-    const response = await s3.send(cmd);
+    const url = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
 
-    const bodyContents = await response.Body?.transformToByteArray();
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...image,
+        url,
+      },
+    });
 
-    if (!bodyContents) throw new Error("Empty file body");
+    // const response = await s3.send(cmd);
+    // const bodyContents = await response.Body?.transformToByteArray();
 
-    const transformedBuffer = Buffer.from(bodyContents);
+    // if (!bodyContents) throw new Error("Empty file body");
 
-    res.set("Content-type", image.mimeType);
+    // const transformedBuffer = Buffer.from(bodyContents);
 
-    return res.status(200).send(transformedBuffer);
+    // res.set("Content-type", image.mimeType);
+
+    // return res.status(200).send(transformedBuffer);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ stata: false, error });
@@ -119,13 +145,12 @@ export const transfromImage = async (req: Request, res: Response) => {
       data: {
         isEdited: true,
         mimeType: options.format || "png",
-        s3Key: image.s3Key,
+        s3Key: newKey,
       },
     });
 
     res.set("Content-type", newMimeType);
     return res.status(200).send(transformedBuffer);
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, error });

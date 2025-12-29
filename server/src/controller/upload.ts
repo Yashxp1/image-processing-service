@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { s3 } from "../lib/s3";
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "../lib/prisma";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import sharp from "sharp";
 
 export const uploadImage = async (req: Request, res: Response) => {
   try {
@@ -12,46 +12,44 @@ export const uploadImage = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const key = `images/${Date.now()}-${file.originalname}`;
+    const timestamp = Date.now();
 
-    const command = new PutObjectCommand({
+    const originalKey = `images/${timestamp}-${file.originalname}`;
+    const thumbnailKey = `images/${timestamp}-${file.originalname}`;
+
+    const thumbnailBuffer = await sharp(file.buffer)
+      .resize(300, 300, { fit: "cover" })
+      .toBuffer();
+
+    const originalFile = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      Key: key,
+      Key: originalKey,
       Body: file.buffer,
       ContentType: file.mimetype,
     });
 
-    await s3.send(command);
+    const thumbnailFile = new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET_NAME!,
+      Key: thumbnailKey,
+      Body: thumbnailBuffer,
+      ContentType: file.mimetype,
+    });
 
-    const signedURL = await getSignedUrl(
-      s3,
-      new GetObjectCommand({
-        Bucket: process.env.AWS_S3_BUCKET_NAME!,
-        Key: key,
-      }),
-      {
-        expiresIn: 60 * 5,
-      }
-    );
-
-  
+    await s3.send(originalFile);
+    await s3.send(thumbnailFile);
 
     const image = await prisma.image.create({
       data: {
         userId: req.user.id,
-        s3Key: key,
-        mimeType: file.mimetype,
+        s3Key: originalKey,
+        thumbnailKey: thumbnailKey,
         name: file.originalname,
-        size: file.size ,
-        isEdited: false
+        mimeType: file.mimetype,
+        size: file.size,
       },
     });
 
-    return res.status(201).json({
-      success: true,
-      imageId: image.id,
-      url: signedURL,
-    });
+    return res.status(201).json({ success: true, imageId: image.id });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, error });
