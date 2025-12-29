@@ -26,10 +26,13 @@ model Image {
   size      Int?
   image_Url String?
   mimeType  String
-  s3Key     String
-  isEdited  Boolean?
-  user      User?   @relation(fields: [userId], references: [id])
-  userId    String
+
+  s3Key        String
+  thumbnailKey String?
+
+  isEdited Boolean?
+  user     User?    @relation(fields: [userId], references: [id])
+  userId   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
