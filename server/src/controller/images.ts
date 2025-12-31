@@ -4,9 +4,20 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../lib/s3";
 import { applyTransformations, TransformOptions } from "../lib/transform";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { getCache, setCache } from "../lib/cache";
 
 export const getImages = async (req: Request, res: Response) => {
   try {
+    const cacheKey = `images:${req.user.id}`;
+
+    const cached = await getCache(cacheKey);
+
+    if (cached) {
+      return res
+        .status(200)
+        .json({ success: true, data: cached, cached: true });
+    }
+
     const images = await prisma.image.findMany({
       where: {
         userId: req.user.id,
@@ -17,14 +28,17 @@ export const getImages = async (req: Request, res: Response) => {
       images.map(async (img) => {
         const cmd = new GetObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET_NAME!,
-        Key: img.thumbnailKey || img.s3Key,
+          Key: img.thumbnailKey || img.s3Key,
         });
 
         const url = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
 
+        await setCache(cacheKey, images, 60);
+
         return {
           ...img,
           url,
+          cached: false,
         };
       })
     );
@@ -41,6 +55,11 @@ export const getImages = async (req: Request, res: Response) => {
 
 export const getImageById = async (req: Request, res: Response) => {
   try {
+    const cacheKey = `image:${req.user.id}:${req.params.id}`;
+
+    const cached = await getCache(cacheKey);
+    if (cached) return res.status(200).json(cached);
+
     const { id } = req.params;
 
     if (!id) {
@@ -64,6 +83,8 @@ export const getImageById = async (req: Request, res: Response) => {
     });
 
     const url = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
+
+    await setCache(cacheKey, image, 30);
 
     return res.status(200).json({
       success: true,
