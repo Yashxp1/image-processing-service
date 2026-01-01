@@ -14,8 +14,8 @@ export const uploadImage = async (req: Request, res: Response) => {
 
     const timestamp = Date.now();
 
-    const originalKey = `images/${timestamp}-${file.originalname}`;
-    const thumbnailKey = `images/${timestamp}-${file.originalname}`;
+    const originalKey = `images/originals/${timestamp}-${file.originalname}`;
+    const thumbnailKey = `images/thumbnails/${timestamp}-${file.originalname}`;
 
     const thumbnailBuffer = await sharp(file.buffer)
       .resize(300, 300, { fit: "cover" })

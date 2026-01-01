@@ -8,48 +8,62 @@ import { getCache, setCache } from "../lib/cache";
 
 export const getImages = async (req: Request, res: Response) => {
   try {
-    const cacheKey = `images:${req.user.id}`;
+    const userId = req.user.id;
+    const cacheKey = `images:list:${userId}`;
 
     const cached = await getCache(cacheKey);
-
     if (cached) {
-      return res
-        .status(200)
-        .json({ success: true, data: cached, cached: true });
+      return res.status(200).json({
+        success: true,
+        data: cached,
+        cached: true,
+      });
     }
 
     const images = await prisma.image.findMany({
       where: {
-        userId: req.user.id,
+        userId,
+      },
+      select: {
+        id: true,
+        thumbnailKey: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    const generateImageUrl = await Promise.all(
+    const data = await Promise.all(
       images.map(async (img) => {
-        const cmd = new GetObjectCommand({
+        const command = new GetObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET_NAME!,
-          Key: img.thumbnailKey || img.s3Key,
+          Key: img.thumbnailKey!,
         });
 
-        const url = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
-
-        await setCache(cacheKey, images, 60);
+        const url = await getSignedUrl(s3, command, {
+          expiresIn: 60 * 60,
+        });
 
         return {
-          ...img,
+          id: img.id,
           url,
-          cached: false,
         };
       })
     );
 
+    await setCache(cacheKey, data, 60);
+
     return res.status(200).json({
       success: true,
-      data: generateImageUrl,
+      data,
+      cached: false,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ status: false, error });
+    console.error("GET /images error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch images",
+    });
   }
 };
 
@@ -145,7 +159,7 @@ export const transfromImage = async (req: Request, res: Response) => {
     const newFormat = options.format || "png";
     const newMimeType = `image/${newFormat}`;
 
-    const newKey = `images-modified/${Date.now()}-${
+    const newKey = `images/modified/${Date.now()}-${
       image.name
     }-edited.${newFormat}`;
 

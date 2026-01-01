@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { generateToken } from "../lib/token";
+import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -102,6 +103,23 @@ export const login = async (req: Request, res: Response) => {
     return res.status(500).json({ sucess: false, error });
   }
 };
+
+export const isLoggedIn = (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.jwt;
+
+    if (!token) {
+      return res.status(400).json({ authenticated: false });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET!);
+
+    return res.status(200).json({ authenticated: true });
+  } catch {
+    return res.status(500).json({ authenticated: false });
+  }
+};
+
 
 export const logout = async (req: Request, res: Response) => {
   try {
