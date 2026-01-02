@@ -6,7 +6,10 @@ const Homes = () => {
 
   return (
     <div className="flex justify-center items-center h-screen">
-      <Button onClick={() => navigate("/upload")}>Get started</Button>
+      {/* <Button onClick={() => navigate("/upload")}>Get started</Button> */}
+      <Button onClick={() => navigate("/login")}>Login</Button>
+
+
     </div>
   );
 };
