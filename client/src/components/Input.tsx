@@ -1,10 +1,12 @@
 interface InputProps {
   className?: string;
   type?: string;
-  value?: string;
+  value?: string | number | undefined;
   placeholder?: string;
   label?: string;
   id?: string;
+  name?: string;
+  disabled?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

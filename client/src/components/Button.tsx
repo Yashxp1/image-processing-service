@@ -1,8 +1,9 @@
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: () => void ;
+  onClick?: () => void;
   type?: "button" | "submit" | "reset";
   className?: string;
+  disabled?: boolean;
 }
 
 const Button = ({
@@ -10,13 +11,15 @@ const Button = ({
   onClick,
   type = "button",
   className = "",
+  disabled = false,
 }: ButtonProps) => {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={`
-                border m-1 flex justify-center items-center bg-zinc-800 hover:bg-zinc-900/20 rounded-lg
+                border flex justify-center items-center bg-zinc-800 hover:bg-zinc-900/20 rounded-lg
                 py-1.5 px-4 font-semibold text-zinc-200 border-zinc-700 transition-all duration-100 hover:border-zinc-700/90 text-xs
         ${className}
       `}
