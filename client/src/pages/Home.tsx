@@ -40,7 +40,7 @@ const Home = () => {
             {techStack.map((tech) => (
               <div
                 key={tech.name}
-                className="border border-zinc-700 p-4 hover:border-zinc-500 transition-colors"
+                className="border border-zinc-700 p-4 hover:bg-black/30 hover:border-zinc-500 transition-colors"
               >
                 <p className="text-sm font-medium text-zinc-100">{tech.name}</p>
                 <p className="text-[10px] text-zinc-400 uppercase tracking-wider mt-1">
@@ -81,7 +81,13 @@ const Home = () => {
 
       <footer className="border-t border-zinc-700 py-6 px-8">
         <div className="max-w-3xl mx-auto flex justify-between items-center text-[10px] text-zinc-400 uppercase tracking-widest">
-          <span>Yashxp1</span>
+          <a
+            href="https://github.com/Yashxp1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Yashxp1</span>
+          </a>
           <span>2026</span>
         </div>
       </footer>
