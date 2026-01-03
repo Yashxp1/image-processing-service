@@ -1,48 +1,91 @@
 # Image Processing Service
 
-A backend-focused image processing service inspired by platforms like Cloudinary.  
-This project is built to demonstrate production-oriented backend engineering: secure authentication, scalable image storage, transformation pipelines, caching, and abuse prevention.
+A backend-focused image processing service designed to demonstrate real-world backend engineering, cloud infrastructure, and performance optimisation.
 
-The service allows authenticated users to upload images, apply transformations, and retrieve optimized results efficiently.
+This project prioritises **scalability, cost-awareness, and clean system boundaries** over visual complexity.
 
 ---
 
-## Tech Stack
+## 🧠 What This Service Does
 
-**Backend**
-- Node.js + Express (TypeScript)
-- PostgreSQL + Prisma ORM
-- AWS S3 (image storage)
-- Sharp (image transformations)
-- Redis (caching & rate limiting)
+- Authenticated users can upload images
+- Images can be transformed (resize, rotate, grayscale, etc.)
+- Image metadata is stored in a database
+- Image files are stored privately in S3
+- Images are delivered directly via a CDN (CloudFront)
+- The backend is **never** in the hot path for image delivery
+
+---
+
+## 🏗️ High-Level Architecture
+
+Client (React)
+→
+API (Express + TypeScript)
+→
+PostgreSQL (metadata)
+→
+Redis (rate limiting & caching)
+→
+AWS S3 (private image storage)
+→
+CloudFront CDN (global image delivery)
+
+
+- The backend **never serves image bytes**
+- Images are fetched directly from CloudFront
+- S3 remains private using Origin Access Control (OAC)
+
+---
+
+## ✨ Features
+
+### Core
+- Image upload with validation
+- Image transformations using Sharp
+- Metadata storage using PostgreSQL + Prisma
 - JWT-based authentication
+- Per-user image isolation
 
-**Planned**
-- Frontend (React + TanStack Query)
-- Docker
-- CI/CD
-- Cloud deployment (AWS)
+### Image Delivery
+- Private S3 bucket
+- CloudFront CDN with OAC
+- CDN-cached image delivery (no signed S3 URLs)
+- Cold cache vs warm cache behavior handled by CDN
+
+### Performance & Safety
+- Redis-based rate limiting
+- Redis caching for image metadata
+- Backend removed from the hot path for image delivery
 
 ---
 
-## Current Features
+## 🛠️ Tech Stack
 
-### Authentication
-- JWT-based auth
-- Protected routes
-- Secure access to user-specific resources
+### Backend
+- **Node.js + Express**
+- **TypeScript**
+- **Prisma + PostgreSQL**
+- **Redis**
+- **Sharp**
+- **JWT Authentication**
 
-### Image Upload & Storage
-- Images uploaded via multipart/form-data
-- Stored in AWS S3 (no images stored in DB)
-- Metadata stored in PostgreSQL via Prisma
+### Infrastructure
+- **AWS S3** (private bucket)
+- **AWS CloudFront** (CDN with OAC)
 
-### Image Processing & Transformations
+### Frontend
+- **React + TypeScript**
+- **TanStack Query**
+- Minimal UI by design (backend-first project)
 
-Image transformations are handled on the backend using **Sharp**.  
-All operations are applied before the image is delivered to the client.
+---
 
-**Supported transformations:**
+## 🖼️ Image Processing
+
+Image transformations are handled using **Sharp**
+
+***Supported transformations:***
 
 - **Resize**
   - `width`: Target width in pixels
@@ -64,79 +107,38 @@ All operations are applied before the image is delivered to the client.
 - **Watermark**
   - `watermarkText`: Text watermark applied to the image
 
-All transformations are optional and can be combined in a single request.
-
-
-
-### Caching
-- Redis used to cache processed image responses
-- Reduces redundant image transformations
-- Improves response times for repeated requests
-
-### Rate Limiting
-- Redis-backed rate limiting
-- Prevents abuse of upload and image retrieval endpoints
-- Configurable limits per route
+Processed images are stored in S3 and delivered via CloudFront, allowing:
+- Low latency delivery
+- Reduced backend load
+- Automatic edge caching
 
 ---
 
-## API Overview (High Level)
+## 🔐 Security Decisions
 
-> Note: Endpoint details may evolve as the project progresses.
+- JWT-based authentication for API access
+- Images are **not publicly accessible via S3**
+- CloudFront uses **Origin Access Control (OAC)** to securely access S3
+- AWS WAF intentionally not enabled (resume project, low attack surface)
 
-- `POST /auth/register` – Register a new user  
-- `POST /auth/login` – Authenticate and receive JWT  
-- `POST /images/upload` – Upload an image (authenticated)  
-- `GET /images` – List user images (authenticated)  
-- `GET /images/:id` – Retrieve a processed image (cached)  
-
----
-
-## Architecture (Current)
-
-- Images stored in **AWS S3**
-- Image metadata stored in **PostgreSQL**
-- Transformations handled via **Sharp**
-- **Redis** sits in front for:
-  - Caching transformed outputs
-  - Rate limiting requests
-- JWT used to protect all sensitive routes
+This setup balances **security, cost, and simplicity**.
 
 ---
 
-## Environment Variables
+## ⚡ Performance Notes
 
-
-
-DATABASE_URL=
-
-JWT_SECRET=
-
-AWS_S3_ACCESS_KEY=
-
-AWS_S3_SECRET_KEY=
-
-AWS_S3_BUCKET_NAME=
-
-AWS_REGION=
-
-REDIS_URL=
-
-
+- First request to an image is a **cold cache miss** and fetches from S3
+- Subsequent requests are served from **CloudFront edge locations**
+- Typical latency improvement observed: **~2s → <300ms**
 
 ---
 
-## Running Locally
+## 📌 Why This Project Exists
 
-```bash
-# install dependencies
-npm install
+This project was built to go beyond CRUD apps and explore:
+- Real backend performance constraints
+- CDN-based architectures
+- Practical cloud infrastructure decisions
+- Production-style system design
 
-# generate prisma client
-npx prisma generate
 
-# run migrations
-npx prisma migrate dev
-
-# start server
-npm run dev
