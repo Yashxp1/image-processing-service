@@ -26,7 +26,12 @@ export const getImages = async (req: Request, res: Response) => {
       },
       select: {
         id: true,
-        thumbnailKey: true,
+        s3Key: true,
+        name: true,
+        mimeType: true,
+        createdAt: true,
+        isEdited: true,
+        size: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -35,18 +40,16 @@ export const getImages = async (req: Request, res: Response) => {
 
     const data = await Promise.all(
       images.map(async (img) => {
-        const command = new GetObjectCommand({
-          Bucket: process.env.AWS_S3_BUCKET_NAME!,
-          Key: img.thumbnailKey!,
-        });
-
-        const url = await getSignedUrl(s3, command, {
-          expiresIn: 60 * 60,
-        });
+        const url = `https://${process.env.CLOUDFRONT_DOMAIN}/${img.s3Key}`;
 
         return {
           id: img.id,
           url,
+          name: img.name,
+          mimeType: img.mimeType,
+          createdAt: img.createdAt,
+          isEdited: img.isEdited,
+          size: img.size,
         };
       })
     );
@@ -159,9 +162,7 @@ export const transfromImage = async (req: Request, res: Response) => {
     const newFormat = options.format || "png";
     const newMimeType = `image/${newFormat}`;
 
-    const newKey = `images/modified/${Date.now()}-${
-      image.name
-    }-edited.${newFormat}`;
+    const newKey = `images/${Date.now()}-${image.name}-edited.${newFormat}`;
 
     const cmd_transformed = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME!,

@@ -26,16 +26,14 @@ export const createRateLimiter = ({
     legacyHeaders: false,
   });
 
-
 export const uploadRateLimiter = createRateLimiter({
   windowMs: 10 * 60 * 1000,
   max: 10,
   prefix: "upload:",
 });
 
-
 export const imagesListLimiter = createRateLimiter({
-  windowMs: 10 * 60 * 1000,
+  windowMs: 20 * 60 * 1000,
   max: 15,
   prefix: "images_list:",
 });
