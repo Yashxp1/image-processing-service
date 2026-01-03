@@ -1,6 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import type { GetImagesResponse } from "../lib/types";
+import type {
+  GetImageByIdResponse,
+  GetImagesResponse,
+  TransformPayload,
+  TransformResponse,
+} from "../lib/types";
 
 const baseUrl = "http://localhost:8080/api/v1";
 
@@ -52,6 +57,53 @@ export function useGetImages() {
       });
 
       return res.data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useUploadImages() {
+  return useMutation({
+    mutationFn: async (payload: { image: File }) => {
+      const response = await axios.post(`${baseUrl}/upload`, payload, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      console.log("success");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+}
+
+export function useTransformImage(imageId: string) {
+  return useMutation<TransformResponse, Error, TransformPayload>({
+    mutationFn: async (payload) => {
+      const { data } = await axios.post<TransformResponse>(
+        `${baseUrl}/images/${imageId}/transform`,
+        payload,
+        { withCredentials: true }
+      );
+      return data;
+    },
+  });
+}
+
+export function useGetImageById(imageId: string) {
+  return useQuery({
+    queryKey: ["image", imageId],
+    queryFn: async () => {
+      const res = await axios.get<GetImageByIdResponse>(
+        `${baseUrl}/images/${imageId}`,
+        { withCredentials: true }
+      );
+      return res.data;
     },
     staleTime: 5 * 60 * 1000,
   });
