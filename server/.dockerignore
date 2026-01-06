@@ -1,5 +1,43 @@
+# Node modules
 node_modules
-dist
-.git
-.env
 npm-debug.log
+
+# Build output
+dist
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# Editor and IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*.test.ts
+*.spec.ts
+coverage
+__tests__
+
+# Documentation
+README.md
+*.md
+
+# Docker files (not needed inside container)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Prisma config (not needed in container)
+prisma.config.ts
