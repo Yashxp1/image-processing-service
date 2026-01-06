@@ -21,8 +21,8 @@ app.use(
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1", imageRoute);
 
-const PORT = 8080;
+const PORT = Number(process.env.PORT) || 3100;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on: http://localhost:${PORT}`);
 });
